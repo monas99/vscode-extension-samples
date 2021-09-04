@@ -4,8 +4,14 @@
 	"description": "abc",
 	"version": "0.0.1",
 	"publisher": "vscode-samples",
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
 	"engines": {
-		"vscode": "^1.30.0"
+		"vscode": "^1.58.0"
 	},
 	"enableProposedApi": true,
 	"categories": [
@@ -13,24 +19,24 @@
 	],
 	"activationEvents": [
 		"onCommand:terminalTest.createAndSend",
-		"onCommand:terminalTest.createFakeShell",
 		"onCommand:terminalTest.createTerminal",
+		"onCommand:terminalTest.createTerminalHideFromUser",
 		"onCommand:terminalTest.createZshLoginShell",
 		"onCommand:terminalTest.dimensions",
 		"onCommand:terminalTest.dispose",
 		"onCommand:terminalTest.hide",
 		"onCommand:terminalTest.onDidChangeTerminalDimensions",
-		"onCommand:terminalTest.onDidWriteData",
-		"onCommand:terminalTest.maximumDimensions",
+		"onCommand:terminalTest.onDidWriteTerminalData",
 		"onCommand:terminalTest.processId",
+		"onCommand:terminalTest.registerTerminalLinkProvider",
 		"onCommand:terminalTest.sendText",
 		"onCommand:terminalTest.sendTextNoNewLine",
 		"onCommand:terminalTest.show",
 		"onCommand:terminalTest.showPreserveFocus",
-		"onCommand:terminalTest.terminalRendererCreate",
-		"onCommand:terminalTest.terminalRendererName",
-		"onCommand:terminalTest.terminalTest.terminalRendererWrite",
-		"onCommand:terminalTest.terminals"
+		"onCommand:terminalTest.terminals",
+		"onCommand:terminalTest.updateEnvironment",
+		"onCommand:terminalTest.clearEnvironment",
+		"onTerminalProfile:terminalTest.terminal-profile"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -40,12 +46,12 @@
 				"title": "Terminal API: Create Terminal and Immediately Send"
 			},
 			{
-				"command": "terminalTest.createFakeShell",
-				"title": "Terminal API: Create Fake Shell (with Terminal Renderer)"
-			},
-			{
 				"command": "terminalTest.createTerminal",
 				"title": "Terminal API: Create Terminal"
+			},
+			{
+				"command": "terminalTest.createTerminalHideFromUser",
+				"title": "Terminal API: Create Terminal (hideFromUser)"
 			},
 			{
 				"command": "terminalTest.createZshLoginShell",
@@ -64,16 +70,12 @@
 				"title": "Terminal API: Hide"
 			},
 			{
-				"command": "terminalTest.onDidWriteData",
+				"command": "terminalTest.onDidWriteTerminalData",
 				"title": "Terminal API: Attach data listener"
 			},
 			{
 				"command": "terminalTest.onDidChangeTerminalDimensions",
 				"title": "Terminal API: Attach dimensions listener"
-			},
-			{
-				"command": "terminalTest.maximumDimensions",
-				"title": "Terminal API: Get maximum dimensions"
 			},
 			{
 				"command": "terminalTest.processId",
@@ -96,35 +98,44 @@
 				"title": "Terminal API: Show (preserving focus)"
 			},
 			{
-				"command": "terminalTest.terminalRendererCreate",
-				"title": "Terminal API: Create Terminal Renderer"
-			},
-			{
-				"command": "terminalTest.terminalRendererName",
-				"title": "Terminal API: Set Terminal Renderer Name"
-			},
-			{
-				"command": "terminalTest.terminalRendererWrite",
-				"title": "Terminal API: Write to Terminal Renderer"
-			},
-			{
 				"command": "terminalTest.terminals",
 				"title": "Terminal API: View terminals"
+			},
+			{
+				"command": "terminalTest.updateEnvironment",
+				"title": "Terminal API: Update environment"
+			},
+			{
+				"command": "terminalTest.clearEnvironment",
+				"title": "Terminal API: Clear environment"
+			},
+			{
+				"command": "terminalTest.registerTerminalLinkProvider",
+				"title": "Terminal API: Register link provider"
 			}
-		]
+		],
+		"terminal": {
+			"profiles": [
+				{
+					"id": "terminalTest.terminal-profile",
+					"icon": "terminal",
+					"title": "Terminal API Profile"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"lint": "tslint ./src/*.ts",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"devDependencies": {
-		"@types/node": "^6.0.40",
-		"tslint": "^5.11.0",
-		"typescript": "^2.0.3",
-		"vscode": "^1.1.22"
+		"@types/node": "^12.12.0",
+		"@types/vscode": "^1.58.0",
+		"@typescript-eslint/eslint-plugin": "^4.16.0",
+		"@typescript-eslint/parser": "^4.16.0",
+		"eslint": "^7.21.0",
+		"typescript": "^4.3.5"
 	}
 }

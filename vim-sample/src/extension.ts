@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
 
 import * as vscode from 'vscode';
 
@@ -22,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}
 
-	let vimExt = new VimExt();
+	const vimExt = new VimExt();
 
 	registerCommandNice('type', function (args) {
 		if (!vscode.window.activeTextEditor) {
@@ -75,7 +74,7 @@ export function deactivate() {
 }
 
 function getConfiguredWordSeparators(): string {
-	let editorConfig = vscode.workspace.getConfiguration('editor');
+	const editorConfig = vscode.workspace.getConfiguration('editor');
 	return editorConfig['wordSeparators'];
 }
 
@@ -101,7 +100,7 @@ class VimExt {
 		});
 
 		vscode.window.onDidChangeTextEditorSelection((e) => {
-			let isVisual = this._controller.getVisual();
+			const isVisual = this._controller.getVisual();
 
 			if (!isVisual) {
 				// a selection in the editor brings us to visual mode
@@ -130,7 +129,7 @@ class VimExt {
 			this._ensureState();
 		});
 
-		var ensureConfig = () => {
+		const ensureConfig = () => {
 			this._controller.setWordSeparators(getConfiguredWordSeparators());
 		};
 		ensureConfig();
@@ -222,7 +221,7 @@ class VimExt {
 		if (!vscode.window.activeTextEditor) {
 			return;
 		}
-		let currentCursorStyle = vscode.window.activeTextEditor.options.cursorStyle;
+		const currentCursorStyle = vscode.window.activeTextEditor.options.cursorStyle;
 		if (currentCursorStyle !== cursorStyle) {
 			vscode.window.activeTextEditor.options = {
 				cursorStyle: cursorStyle

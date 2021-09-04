@@ -2,11 +2,9 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-
 import {
 	createConnection,
 	TextDocuments,
-	TextDocument,
 	Diagnostic,
 	DiagnosticSeverity,
 	ProposedFeatures,
@@ -14,26 +12,31 @@ import {
 	DidChangeConfigurationNotification,
 	CompletionItem,
 	CompletionItemKind,
-	TextDocumentPositionParams
-} from 'vscode-languageserver';
+	TextDocumentPositionParams,
+	TextDocumentSyncKind,
+	InitializeResult
+} from 'vscode-languageserver/node';
 
-// Create a connection for the server. The connection uses Node's IPC as a transport.
+import {
+	TextDocument
+} from 'vscode-languageserver-textdocument';
+
+// Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
-let connection = createConnection(ProposedFeatures.all);
+const connection = createConnection(ProposedFeatures.all);
 
-// Create a simple text document manager. The text document manager
-// supports full document sync only
-let documents: TextDocuments = new TextDocuments();
+// Create a simple text document manager.
+const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-let hasConfigurationCapability: boolean = false;
-let hasWorkspaceFolderCapability: boolean = false;
-let hasDiagnosticRelatedInformationCapability: boolean = false;
+let hasConfigurationCapability = false;
+let hasWorkspaceFolderCapability = false;
+let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
-	let capabilities = params.capabilities;
+	const capabilities = params.capabilities;
 
 	// Does the client support the `workspace/configuration` request?
-	// If not, we will fall back using global settings
+	// If not, we fall back using global settings.
 	hasConfigurationCapability = !!(
 		capabilities.workspace && !!capabilities.workspace.configuration
 	);
@@ -46,15 +49,23 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities.textDocument.publishDiagnostics.relatedInformation
 	);
 
-	return {
+	const result: InitializeResult = {
 		capabilities: {
-			textDocumentSync: documents.syncKind,
-			// Tell the client that the server supports code completion
+			textDocumentSync: TextDocumentSyncKind.Incremental,
+			// Tell the client that this server supports code completion.
 			completionProvider: {
 				resolveProvider: true
 			}
 		}
 	};
+	if (hasWorkspaceFolderCapability) {
+		result.capabilities.workspace = {
+			workspaceFolders: {
+				supported: true
+			}
+		};
+	}
+	return result;
 });
 
 connection.onInitialized(() => {
@@ -81,7 +92,7 @@ const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
 let globalSettings: ExampleSettings = defaultSettings;
 
 // Cache the settings of all open documents
-let documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
@@ -125,18 +136,18 @@ documents.onDidChangeContent(change => {
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
-	let settings = await getDocumentSettings(textDocument.uri);
+	const settings = await getDocumentSettings(textDocument.uri);
 
 	// The validator creates diagnostics for all uppercase words length 2 and more
-	let text = textDocument.getText();
-	let pattern = /\b[A-Z]{2,}\b/g;
+	const text = textDocument.getText();
+	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
 
 	let problems = 0;
-	let diagnostics: Diagnostic[] = [];
+	const diagnostics: Diagnostic[] = [];
 	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
 		problems++;
-		let diagnostic: Diagnostic = {
+		const diagnostic: Diagnostic = {
 			severity: DiagnosticSeverity.Warning,
 			range: {
 				start: textDocument.positionAt(m.index),
@@ -210,26 +221,6 @@ connection.onCompletionResolve(
 		return item;
 	}
 );
-
-/*
-connection.onDidOpenTextDocument((params) => {
-	// A text document got opened in VSCode.
-	// params.uri uniquely identifies the document. For documents store on disk this is a file URI.
-	// params.text the initial full content of the document.
-	connection.console.log(`${params.textDocument.uri} opened.`);
-});
-connection.onDidChangeTextDocument((params) => {
-	// The content of a text document did change in VSCode.
-	// params.uri uniquely identifies the document.
-	// params.contentChanges describe the content changes to the document.
-	connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-});
-connection.onDidCloseTextDocument((params) => {
-	// A text document got closed in VSCode.
-	// params.uri uniquely identifies the document.
-	connection.console.log(`${params.textDocument.uri} closed.`);
-});
-*/
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events

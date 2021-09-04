@@ -2,11 +2,11 @@
 
 This is a sample extension that adds a status bar entry showing the current number of selected lines.
 
-![Show number of selected lines](https://raw.githubusercontent.com/Microsoft/vscode-extension-samples/master/statusbar-sample/preview.gif)
+![Show number of selected lines](https://raw.githubusercontent.com/Microsoft/vscode-extension-samples/main/statusbar-sample/preview.gif)
 
 
 ## VS Code API
 
 ### `vscode` module
 
-- [`languages.registerCompletionItemProvider`](https://code.visualstudio.com/api/references/vscode-api#window.createStatusBarItem)
+- [`window.createStatusBarItem`](https://code.visualstudio.com/api/references/vscode-api#window.createStatusBarItem)

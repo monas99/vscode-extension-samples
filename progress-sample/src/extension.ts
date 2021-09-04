@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
 
 import { ExtensionContext, StatusBarAlignment, window, StatusBarItem, Selection, workspace, TextEditor, commands, ProgressLocation } from 'vscode';
 
@@ -14,7 +13,7 @@ export function activate(context: ExtensionContext) {
 			cancellable: true
 		}, (progress, token) => {
 			token.onCancellationRequested(() => {
-				console.log("User canceled the long running operation")
+				console.log("User canceled the long running operation");
 			});
 
 			progress.report({ increment: 0 });
@@ -31,7 +30,7 @@ export function activate(context: ExtensionContext) {
 				progress.report({ increment: 50, message: "I am long running! - almost there..." });
 			}, 3000);
 
-			var p = new Promise(resolve => {
+			const p = new Promise<void>(resolve => {
 				setTimeout(() => {
 					resolve();
 				}, 5000);

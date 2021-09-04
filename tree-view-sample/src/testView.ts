@@ -4,10 +4,17 @@ export class TestView {
 
 	constructor(context: vscode.ExtensionContext) {
 		const view = vscode.window.createTreeView('testView', { treeDataProvider: aNodeWithIdTreeDataProvider(), showCollapseAll: true });
+		context.subscriptions.push(view);
 		vscode.commands.registerCommand('testView.reveal', async () => {
 			const key = await vscode.window.showInputBox({ placeHolder: 'Type the label of the item to reveal' });
 			if (key) {
 				await view.reveal({ key }, { focus: true, select: false, expand: true });
+			}
+		});
+		vscode.commands.registerCommand('testView.changeTitle', async () => {
+			const title = await vscode.window.showInputBox({ prompt: 'Type the new title for the Test View', placeHolder: view.title });
+			if (title) {
+				view.title = title;
 			}
 		});
 	}
@@ -33,7 +40,7 @@ const tree = {
 		'bb': {}
 	}
 };
-let nodes = {};
+const nodes = {};
 
 function aNodeWithIdTreeDataProvider(): vscode.TreeDataProvider<{ key: string }> {
 	return {
@@ -56,18 +63,20 @@ function getChildren(key: string): string[] {
 	if (!key) {
 		return Object.keys(tree);
 	}
-	let treeElement = getTreeElement(key);
+	const treeElement = getTreeElement(key);
 	if (treeElement) {
 		return Object.keys(treeElement);
 	}
 	return [];
 }
 
-function getTreeItem(key: string): vscode.TreeItem2 {
+function getTreeItem(key: string): vscode.TreeItem {
 	const treeElement = getTreeElement(key);
+	// An example of how to use codicons in a MarkdownString in a tree item tooltip.
+	const tooltip = new vscode.MarkdownString(`$(zap) Tooltip for ${key}`, true);
 	return {
-		label: <vscode.TreeItemLabel>{ label: key, highlights: key.length > 1 ? [[key.length - 2, key.length - 1]] : void 0},
-		tooltip: `Tooltip for ${key}`,
+		label: /**vscode.TreeItemLabel**/<any>{ label: key, highlights: key.length > 1 ? [[key.length - 2, key.length - 1]] : void 0 },
+		tooltip,
 		collapsibleState: treeElement && Object.keys(treeElement).length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
 	};
 }

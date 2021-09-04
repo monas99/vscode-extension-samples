@@ -2,13 +2,11 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
-
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	let provider1 = vscode.languages.registerCompletionItemProvider('plaintext', {
+	const provider1 = vscode.languages.registerCompletionItemProvider('plaintext', {
 
 		provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext) {
 
@@ -16,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const simpleCompletion = new vscode.CompletionItem('Hello World!');
 
 			// a completion item that inserts its text as snippet,
-			// the `insertText`-property is a `SnippetString` which we will
+			// the `insertText`-property is a `SnippetString` which will be
 			// honored by the editor.
 			const snippetCompletion = new vscode.CompletionItem('Good part of the day');
 			snippetCompletion.insertText = new vscode.SnippetString('Good ${1|morning,afternoon,evening|}. It is ${1}, right?');
@@ -54,8 +52,8 @@ export function activate(context: vscode.ExtensionContext) {
 			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
 
 				// get all text until the `position` and check if it reads `console.`
-				// and iff so then complete if `log`, `warn`, and `error`
-				let linePrefix = document.lineAt(position).text.substr(0, position.character);
+				// and if so then complete if `log`, `warn`, and `error`
+				const linePrefix = document.lineAt(position).text.substr(0, position.character);
 				if (!linePrefix.endsWith('console.')) {
 					return undefined;
 				}

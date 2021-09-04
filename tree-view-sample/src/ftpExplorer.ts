@@ -15,9 +15,6 @@ export interface FtpNode {
 }
 
 export class FtpModel {
-
-	private nodes: Map<string, FtpNode> = new Map<string, FtpNode>();
-
 	constructor(readonly host: string, private user: string, private password: string) {
 	}
 
@@ -30,7 +27,7 @@ export class FtpModel {
 
 			client.on('error', error => {
 				e('Error while connecting: ' + error.message);
-			})
+			});
 
 			client.connect({
 				host: this.host,
@@ -94,10 +91,10 @@ export class FtpModel {
 						return e(err);
 					}
 
-					let string = ''
+					let string = '';
 					stream.on('data', function (buffer) {
 						if (buffer) {
-							var part = buffer.toString();
+							const part = buffer.toString();
 							string += part;
 						}
 					});
@@ -120,7 +117,7 @@ export class FtpTreeDataProvider implements vscode.TreeDataProvider<FtpNode>, vs
 	constructor(private readonly model: FtpModel) { }
 
 	public refresh(): any {
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 

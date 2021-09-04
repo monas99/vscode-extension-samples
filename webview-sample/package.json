@@ -3,8 +3,14 @@
 	"description": "Cat Coding - A Webview API Sample",
 	"version": "0.0.1",
 	"publisher": "vscode-samples",
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
 	"engines": {
-		"vscode": "^1.26.0"
+		"vscode": "^1.47.0"
 	},
 	"categories": [
 		"Other"
@@ -30,16 +36,19 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "tsc -p ./",
+		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"watch": "tsc -w -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install"
+		"lint": "eslint . --ext .ts,.tsx",
+		"watch": "tsc -w -p ./"
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@types/node": "^10.5.2",
-		"tslint": "^5.11.0",
-		"typescript": "^2.9.2",
-		"vscode": "^1.1.29"
+		"@types/node": "^12.12.0",
+		"@types/vscode": "^1.47.0",
+		"@types/vscode-webview": "^1.57.0",
+		"@typescript-eslint/eslint-plugin": "^4.16.0",
+		"@typescript-eslint/parser": "^4.16.0",
+		"eslint": "^7.21.0",
+		"typescript": "^4.3.5"
 	}
 }

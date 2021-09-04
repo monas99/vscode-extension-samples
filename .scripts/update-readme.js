@@ -12,7 +12,7 @@ const LSP_TABLE_HEAD = `<!-- LSP_SAMPLES_BEGIN -->
 const LSP_TABLE_END = `<!-- LSP_SAMPLES_END -->`
 
 const getTableRow = sample => {
-  const descriptionCell = `[${sample.description}](https://github.com/Microsoft/vscode-extension-samples/tree/master/${sample.path})`
+  const descriptionCell = `[${sample.description}](https://github.com/Microsoft/vscode-extension-samples/tree/main/${sample.path})`
   let guideCell
   if (!sample.guide) {
     guideCell = 'N/A'
@@ -51,7 +51,7 @@ ${LSP_TABLE_END.trim()}`
 
 const readme = fs.readFileSync('README.md', 'utf-8')
 const newReadme = readme
-  .replace(/<!-- SAMPLES_BEGIN -->(.|\n)*<!-- SAMPLES_END -->/gm, getSamplesTable(samples))
+  .replace(/<!-- SAMPLES_BEGIN -->(.|\n)*<!-- SAMPLES_END -->/gm, getSamplesTable(samples.filter(x => !x.excludeFromReadme)))
   .replace(/<!-- LSP_SAMPLES_BEGIN -->(.|\n)*<!-- LSP_SAMPLES_END -->/gm, getLSPSamplesTable(lspSamples))
 
 fs.writeFileSync('README.md', newReadme)

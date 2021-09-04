@@ -8,7 +8,7 @@ import { basename } from "path";
  */
 export class JSFiddleDocumentContentProvider implements TextDocumentContentProvider, Disposable {
 	private _onDidChange = new EventEmitter<Uri>();
-	private fiddles = new Map<string, Fiddle>();
+	private fiddles = new Map<string, Fiddle>(); // this assumes each fiddle is only open once per workspace
 
 	get onDidChange(): Event<Uri> {
 		return this._onDidChange.event;
@@ -28,15 +28,15 @@ export class JSFiddleDocumentContentProvider implements TextDocumentContentProvi
 	}
 
 	provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string> {
-		if (token.isCancellationRequested) return "Canceled";
+		if (token.isCancellationRequested) { return "Canceled"; }
 
 		let fiddleSlug = basename(uri.fsPath);
 		// strip off the file extension
 		fiddleSlug = fiddleSlug.split('.').slice(0, -1).join('.');
-		let fiddlePart = toExtension(uri);
+		const fiddlePart = toExtension(uri);
 
-		let fiddle = this.fiddles.get(fiddleSlug);
-		if (!fiddle) return "Resource not found: " + uri.toString();
+		const fiddle = this.fiddles.get(fiddleSlug);
+		if (!fiddle) { return "Resource not found: " + uri.toString(); }
 
 		return fiddle.data[fiddlePart];
 	}

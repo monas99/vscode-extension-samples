@@ -5,8 +5,14 @@
 	"version": "0.0.1",
 	"publisher": "vscode-samples",
 	"enableProposedApi": true,
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
 	"engines": {
-		"vscode": "^1.25.0"
+		"vscode": "^1.57.0"
 	},
 	"categories": [
 		"Other"
@@ -17,9 +23,10 @@
 		"onView:jsonOutline",
 		"onView:fileExplorer",
 		"onView:testView",
+		"onView:testViewDragAndDrop",
 		"onLanguage:json",
 		"onLanguage:jsonc",
-		"onCommand:sample.reveal"
+		"onCommand:testView.reveal"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -36,7 +43,9 @@
 			"package-explorer": [
 				{
 					"id": "nodeDependencies",
-					"name": "Node Dependencies"
+					"name": "Node Dependencies",
+					"icon": "media/dep.svg",
+					"contextualTitle": "Package Explorer"
 				}
 			],
 			"explorer": [
@@ -56,6 +65,10 @@
 				{
 					"id": "testView",
 					"name": "Test View"
+				},
+				{
+					"id": "testViewDragAndDrop",
+					"name": "Test View Drag and Drop"
 				}
 			]
 		},
@@ -135,6 +148,10 @@
 			{
 				"command": "testView.reveal",
 				"title": "Test View: Reveal"
+			},
+			{
+				"command": "testView.changeTitle",
+				"title": "Test View: Change Title"
 			}
 		],
 		"menus": {
@@ -206,19 +223,22 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install"
+		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"devDependencies": {
 		"@types/mkdirp": "^0.5.2",
-		"@types/node": "*",
+		"@types/node": "^12.12.0",
 		"@types/rimraf": "^2.0.2",
-		"tslint": "^5.11.0",
-		"typescript": "^2.1.4",
-		"vscode": "^1.1.22"
+		"@types/vscode": "^1.52.0",
+		"@typescript-eslint/eslint-plugin": "^4.16.0",
+		"@typescript-eslint/parser": "^4.16.0",
+		"eslint": "^7.21.0",
+		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"jsonc-parser": "^0.4.2",
 		"ftp": "^0.3.10",
+		"jsonc-parser": "^0.4.2",
+		"minimist": "^0.2.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.2"
 	}

@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
 
 import { Position, TextDocument, window } from 'vscode';
 import { Words, WordCharacters } from './words';
@@ -10,9 +9,9 @@ import { Command, AbstractCommandDescriptor } from './common';
 
 export class MotionState {
 
-	public anchor: Position;
+	public anchor: Position | null;
 	public cursorDesiredCharacter: number;
-	public wordCharacterClass: WordCharacters;
+	public wordCharacterClass: WordCharacters | null;
 
 	constructor() {
 		this.cursorDesiredCharacter = -1;
@@ -45,7 +44,7 @@ class RepeatingMotion extends Motion {
 	}
 
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		for (var cnt = 0; cnt < this._repeatCount; cnt++) {
+		for (let cnt = 0; cnt < this._repeatCount; cnt++) {
 			pos = this._actual.run(doc, pos, state);
 		}
 		return pos;
@@ -65,7 +64,7 @@ class NextCharacterMotion extends Motion {
 
 class LeftMotion extends Motion {
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let line = pos.line;
+		const line = pos.line;
 
 		if (pos.character > 0) {
 			state.cursorDesiredCharacter = pos.character - 1;
@@ -108,8 +107,8 @@ class UpMotion extends Motion {
 
 class RightMotion extends Motion {
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let line = pos.line;
-		let maxCharacter = doc.lineAt(line).text.length;
+		const line = pos.line;
+		const maxCharacter = doc.lineAt(line).text.length;
 
 		if (pos.character < maxCharacter) {
 			state.cursorDesiredCharacter = pos.character + 1;
@@ -134,14 +133,14 @@ class StartOfLineMotion extends Motion {
 
 class NextWordStartMotion extends Motion {
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let lineContent = doc.lineAt(pos.line).text;
+		const lineContent = doc.lineAt(pos.line).text;
 
 		if (pos.character >= lineContent.length - 1) {
 			// cursor at end of line
 			return ((pos.line + 1 < doc.lineCount) ? new Position(pos.line + 1, 0) : pos);
 		}
 
-		let nextWord = Words.findNextWord(doc, pos, state.wordCharacterClass);
+		const nextWord = Words.findNextWord(doc, pos, state.wordCharacterClass);
 
 		if (!nextWord) {
 			// return end of the line
@@ -150,7 +149,7 @@ class NextWordStartMotion extends Motion {
 
 		if (nextWord.start <= pos.character && pos.character < nextWord.end) {
 			// Sitting on a word
-			let nextNextWord = Words.findNextWord(doc, new Position(pos.line, nextWord.end), state.wordCharacterClass);
+			const nextNextWord = Words.findNextWord(doc, new Position(pos.line, nextWord.end), state.wordCharacterClass);
 			if (nextNextWord) {
 				// return start of the next next word
 				return new Position(pos.line, nextNextWord.start);
@@ -167,14 +166,14 @@ class NextWordStartMotion extends Motion {
 
 class NextWordEndMotion extends Motion {
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let lineContent = doc.lineAt(pos.line).text;
+		const lineContent = doc.lineAt(pos.line).text;
 
 		if (pos.character >= lineContent.length - 1) {
 			// no content on this line or cursor at end of line
 			return ((pos.line + 1 < doc.lineCount) ? new Position(pos.line + 1, 0) : pos);
 		}
 
-		let nextWord = Words.findNextWord(doc, pos, state.wordCharacterClass);
+		const nextWord = Words.findNextWord(doc, pos, state.wordCharacterClass);
 
 		if (!nextWord) {
 			// return end of the line
@@ -203,10 +202,10 @@ class GoToLineUndefinedMotion extends Motion {
 abstract class GoToLineMotion extends Motion {
 
 	protected firstNonWhitespaceChar(doc: TextDocument, line: number): number {
-		let lineContent = doc.lineAt(line).text;
+		const lineContent = doc.lineAt(line).text;
 		let character = 0;
 		while (character < lineContent.length) {
-			let ch = lineContent.charAt(character);
+			const ch = lineContent.charAt(character);
 			if (ch !== ' ' && ch !== '\t') {
 				break;
 			}
@@ -225,7 +224,7 @@ class GoToFirstLineMotion extends GoToLineMotion {
 
 class GoToLastLineMotion extends GoToLineMotion {
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let lastLine = doc.lineCount - 1;
+		const lastLine = doc.lineCount - 1;
 		return new Position(lastLine, this.firstNonWhitespaceChar(doc, lastLine));
 	}
 }
@@ -239,7 +238,7 @@ class GoToLineDefinedMotion extends GoToLineMotion {
 	}
 
 	public run(doc: TextDocument, pos: Position, state: MotionState): Position {
-		let line = Math.min(doc.lineCount - 1, Math.max(0, this._lineNumber - 1));
+		const line = Math.min(doc.lineCount - 1, Math.max(0, this._lineNumber - 1));
 		return new Position(line, this.firstNonWhitespaceChar(doc, line));
 	}
 }
@@ -251,7 +250,7 @@ class CursorMoveCommand extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let cursorMoveArgs: any = {
+		const cursorMoveArgs: any = {
 			to: this.to,
 			by: this.by,
 			value: args.repeat || 1,
@@ -271,7 +270,7 @@ class EditorScrollCommand extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let editorScrollArgs: any = {
+		const editorScrollArgs: any = {
 			to: this.to,
 			by: this.by,
 			value: args.repeat || 1,
@@ -310,7 +309,7 @@ class MoveActiveEditorCommandByPosition extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let moveActiveEditorArgs: any = {
+		const moveActiveEditorArgs: any = {
 			to: args.repeat === void 0 ? 'last' : 'position',
 			value: args.repeat !== void 0 ? args.repeat + 1 : undefined
 		};
@@ -328,7 +327,7 @@ class MoveActiveEditorCommand extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let moveActiveEditorArgs: any = {
+		const moveActiveEditorArgs: any = {
 			to: this.to,
 			value: args.repeat ? args.repeat : 1
 		};
@@ -345,7 +344,7 @@ class FoldCommand extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let foldEditorArgs: any = {
+		const foldEditorArgs: any = {
 			levels: args.repeat ? args.repeat : 1,
 			direction: 'up'
 		};
@@ -363,7 +362,7 @@ class UnfoldCommand extends AbstractCommandDescriptor {
 	}
 
 	public createCommand(args?: any): Command {
-		let foldEditorArgs: any = {
+		const foldEditorArgs: any = {
 			levels: args.repeat ? args.repeat : 1,
 			direction: 'up'
 		};

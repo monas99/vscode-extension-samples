@@ -8,8 +8,11 @@ export function activate(context: vscode.ExtensionContext) {
 	if (vscode.window.activeTextEditor) {
 		updateDiagnostics(vscode.window.activeTextEditor.document, collection);
 	}
-	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(e => updateDiagnostics(e.document, collection)));
-
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+		if (editor) {
+			updateDiagnostics(editor.document, collection);
+		}
+	}));
 }
 
 function updateDiagnostics(document: vscode.TextDocument, collection: vscode.DiagnosticCollection): void {
@@ -27,8 +30,4 @@ function updateDiagnostics(document: vscode.TextDocument, collection: vscode.Dia
 	} else {
 		collection.clear();
 	}
-}
-
-// this method is called when your extension is deactivated
-export function deactivate() {
 }

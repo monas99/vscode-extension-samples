@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
 
 import * as vscode from 'vscode';
 
@@ -14,7 +13,7 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 	// item is selected
 	const myCommandId = 'sample.showSelectionCount';
 	subscriptions.push(vscode.commands.registerCommand(myCommandId, () => {
-		let n = getNumberOfSelectedLines(vscode.window.activeTextEditor);
+		const n = getNumberOfSelectedLines(vscode.window.activeTextEditor);
 		vscode.window.showInformationMessage(`Yeah, ${n} line(s) selected... Keep going!`);
 	}));
 
@@ -33,7 +32,7 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 }
 
 function updateStatusBarItem(): void {
-	let n = getNumberOfSelectedLines(vscode.window.activeTextEditor);
+	const n = getNumberOfSelectedLines(vscode.window.activeTextEditor);
 	if (n > 0) {
 		myStatusBarItem.text = `$(megaphone) ${n} line(s) selected`;
 		myStatusBarItem.show();

@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
 
 import { Position, Selection, Range, TextDocument, TextEditor, TextEditorRevealType } from 'vscode';
 import { Motion, Motions } from './motions';
@@ -58,7 +57,7 @@ class InsertOperator extends OperatorWithNoArgs {
 
 class AppendOperator extends OperatorWithNoArgs {
 	protected _run(ctrl: IController, ed: TextEditor): void {
-		let newPos = Motions.RightMotion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
+		const newPos = Motions.RightMotion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
 		this.setPosReveal(ed, newPos.line, newPos.character);
 		ctrl.setMode(Mode.INSERT);
 	}
@@ -66,7 +65,7 @@ class AppendOperator extends OperatorWithNoArgs {
 
 class AppendEndOfLineOperator extends OperatorWithNoArgs {
 	protected _run(ctrl: IController, ed: TextEditor): void {
-		let newPos = Motions.EndOfLine.run(this.doc(ed), this.pos(ed), ctrl.motionState);
+		const newPos = Motions.EndOfLine.run(this.doc(ed), this.pos(ed), ctrl.motionState);
 		this.setPosReveal(ed, newPos.line, newPos.character);
 		ctrl.setMode(Mode.INSERT);
 	}
@@ -81,8 +80,8 @@ class VisualOperator extends OperatorWithNoArgs {
 
 class DeleteCharUnderCursorOperator extends Operator {
 	public runNormalMode(ctrl: IController, ed: TextEditor, repeatCount: number, args: string): boolean {
-		let to = Motions.NextCharacter.repeat(repeatCount > 1, repeatCount).run(this.doc(ed), this.pos(ed), ctrl.motionState);
-		let from = this.pos(ed);
+		const to = Motions.NextCharacter.repeat(repeatCount > 1, repeatCount).run(this.doc(ed), this.pos(ed), ctrl.motionState);
+		const from = this.pos(ed);
 
 		this.delete(ctrl, ed, false, new Range(from.line, from.character, to.line, to.character));
 
@@ -90,7 +89,7 @@ class DeleteCharUnderCursorOperator extends Operator {
 	}
 
 	public runVisualMode(ctrl: IController, ed: TextEditor, args: string): boolean {
-		let sel = this.sel(ed);
+		const sel = this.sel(ed);
 		this.delete(ctrl, ed, false, sel);
 		return true;
 	}
@@ -98,8 +97,8 @@ class DeleteCharUnderCursorOperator extends Operator {
 
 class DeleteLineOperator extends Operator {
 	public runNormalMode(ctrl: IController, ed: TextEditor, repeatCount: number, args: string): boolean {
-		let pos = this.pos(ed);
-		let doc = this.doc(ed);
+		const pos = this.pos(ed);
+		const doc = this.doc(ed);
 
 		let fromLine = pos.line;
 		let fromCharacter = 0;
@@ -124,7 +123,7 @@ class DeleteLineOperator extends Operator {
 	}
 
 	public runVisualMode(ctrl: IController, ed: TextEditor, args: string): boolean {
-		let sel = this.sel(ed);
+		const sel = this.sel(ed);
 		this.delete(ctrl, ed, false, sel);
 		return true;
 	}
@@ -132,7 +131,7 @@ class DeleteLineOperator extends Operator {
 
 abstract class OperatorWithMotion extends Operator {
 	public runNormalMode(ctrl: IController, ed: TextEditor, repeatCount: number, args: string): boolean {
-		let motion = ctrl.findMotion(args);
+		const motion = ctrl.findMotion(args);
 		if (!motion) {
 
 			// is it motion building
@@ -161,8 +160,8 @@ class DeleteToOperator extends OperatorWithMotion {
 	}
 
 	protected _runNormalMode(ctrl: IController, ed: TextEditor, motion: Motion): boolean {
-		let to = motion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
-		let from = this.pos(ed);
+		const to = motion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
+		const from = this.pos(ed);
 
 		this.delete(ctrl, ed, false, new Range(from.line, from.character, to.line, to.character));
 
@@ -170,7 +169,7 @@ class DeleteToOperator extends OperatorWithMotion {
 	}
 
 	public runVisualMode(ctrl: IController, ed: TextEditor, args: string): boolean {
-		let sel = this.sel(ed);
+		const sel = this.sel(ed);
 		this.delete(ctrl, ed, false, sel);
 		return true;
 	}
@@ -179,7 +178,7 @@ class DeleteToOperator extends OperatorWithMotion {
 class PutOperator extends Operator {
 
 	public runNormalMode(ctrl: IController, ed: TextEditor, repeatCount: number, args: string): boolean {
-		let register = ctrl.getDeleteRegister();
+		const register = ctrl.getDeleteRegister();
 		if (!register) {
 			// No delete register - beep!!
 			return true;
@@ -187,7 +186,7 @@ class PutOperator extends Operator {
 
 		let str = repeatString(register.content, repeatCount);
 
-		let pos = this.pos(ed);
+		const pos = this.pos(ed);
 		if (!register.isWholeLine) {
 			ed.edit((builder) => {
 				builder.insert(new Position(pos.line, pos.character + 1), str);
@@ -195,7 +194,7 @@ class PutOperator extends Operator {
 			return true;
 		}
 
-		let doc = this.doc(ed);
+		const doc = this.doc(ed);
 		let insertLine = pos.line + 1;
 		let insertCharacter = 0;
 
@@ -214,15 +213,15 @@ class PutOperator extends Operator {
 	}
 
 	public runVisualMode(ctrl: IController, ed: TextEditor, args: string): boolean {
-		let register = ctrl.getDeleteRegister();
+		const register = ctrl.getDeleteRegister();
 		if (!register) {
 			// No delete register - beep!!
-			return;
+			return false;
 		}
 
-		let str = register.content;
+		const str = register.content;
 
-		let sel = this.sel(ed);
+		const sel = this.sel(ed);
 		ed.edit((builder) => {
 			builder.replace(sel, str);
 		});
@@ -239,9 +238,9 @@ class ReplaceOperator extends Operator {
 			return false;
 		}
 
-		let doc = this.doc(ed);
-		let pos = this.pos(ed);
-		let toCharacter = pos.character + repeatCount;
+		const doc = this.doc(ed);
+		const pos = this.pos(ed);
+		const toCharacter = pos.character + repeatCount;
 		if (toCharacter > doc.lineAt(pos).text.length) {
 			// invalid replace (beep!)
 			return true;
@@ -260,13 +259,13 @@ class ReplaceOperator extends Operator {
 			return false;
 		}
 
-		let doc = this.doc(ed);
-		let sel = this.sel(ed);
+		const doc = this.doc(ed);
+		const sel = this.sel(ed);
 
-		let srcString = doc.getText(sel);
+		const srcString = doc.getText(sel);
 		let dstString = '';
 		for (let i = 0; i < srcString.length; i++) {
-			let ch = srcString.charAt(i);
+			const ch = srcString.charAt(i);
 			if (ch === '\r' || ch === '\n') {
 				dstString += ch;
 			} else {
@@ -300,8 +299,8 @@ class ReplaceModeOperator extends Operator {
 class ChangeOperator extends OperatorWithMotion {
 
 	protected _runNormalMode(ctrl: IController, ed: TextEditor, motion: Motion): boolean {
-		let to = motion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
-		let from = this.pos(ed);
+		const to = motion.run(this.doc(ed), this.pos(ed), ctrl.motionState);
+		const from = this.pos(ed);
 
 		this.delete(ctrl, ed, false, new Range(from.line, from.character, to.line, to.character));
 
@@ -311,7 +310,7 @@ class ChangeOperator extends OperatorWithMotion {
 	}
 
 	public runVisualMode(ctrl: IController, ed: TextEditor, args: string): boolean {
-		let sel = this.sel(ed);
+		const sel = this.sel(ed);
 
 		this.delete(ctrl, ed, false, sel);
 

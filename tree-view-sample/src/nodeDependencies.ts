@@ -4,10 +4,10 @@ import * as path from 'path';
 
 export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined | void> = new vscode.EventEmitter<Dependency | undefined | void>();
+	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined | void> = this._onDidChangeTreeData.event;
 
-	constructor(private workspaceRoot: string) {
+	constructor(private workspaceRoot: string | undefined) {
 	}
 
 	refresh(): void {
@@ -55,7 +55,7 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
 						arguments: [moduleName]
 					});
 				}
-			}
+			};
 
 			const deps = packageJson.dependencies
 				? Object.keys(packageJson.dependencies).map(dep => toDep(dep, packageJson.dependencies[dep]))
@@ -84,19 +84,14 @@ export class Dependency extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
-		private version: string,
+		private readonly version: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
-	}
 
-	get tooltip(): string {
-		return `${this.label}-${this.version}`;
-	}
-
-	get description(): string {
-		return this.version;
+		this.tooltip = `${this.label}-${this.version}`;
+		this.description = this.version;
 	}
 
 	iconPath = {
@@ -105,5 +100,4 @@ export class Dependency extends vscode.TreeItem {
 	};
 
 	contextValue = 'dependency';
-
 }
